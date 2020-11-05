@@ -1,0 +1,41 @@
+﻿
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+<section>
+    <h2>Create a Book</h2>
+    <form action="/Book/Create" method="POST">
+        <label for="title">Title:</label>
+        <input id="title" type="text" name="title" value="@(ViewBag.bookTitle)" required /><br />
+        <label for="authorID">Select an Author:</label>
+        <select name="authorID" id="authorID" required>
+            <option value="" selected>Select an Author</option>
+            @foreach (Author author in ViewBag.authors)
+            {
+
+                @if (author.ID.ToString() == ViewBag.authorID)
+                {
+                    <option value="@(author.ID)" selected>@(author.Name)</option>
+                }
+                else
+                {
+                    <option value="@(author.ID)">@(author.Name)</option>
+                }
+            }
+        </select>
+
+        <label for="publicationDate">Publication Date</label>
+        <input id="publicationDate" type="date" name="publicationDate" value="" required /><br />
+        <input type="submit" value="Submit" />
+    </form>
+</section>
+
+<section>
+    @if (ViewBag.addMessage != null)
+    {
+        <p>@(ViewBag.addMessage)</p>
+    }
+</section>
+

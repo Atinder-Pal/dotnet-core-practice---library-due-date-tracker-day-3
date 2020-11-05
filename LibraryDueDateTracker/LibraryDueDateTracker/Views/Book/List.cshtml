@@ -1,0 +1,58 @@
+﻿
+@{
+    ViewData["Title"] = "List";
+}
+
+<h1>List</h1>
+@if (ViewBag.list != null && ViewBag.list.Count > 0)
+{
+    <table class="table">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Published</th>
+            <th>Checked Out</th>
+            <th>Due Date</th>
+            <th>Returned</th>
+        </tr>
+        @foreach (Book book in ViewBag.list)
+        {
+            <tr>
+                <td>@(book.ID)</td>
+                <td><a href="/Book/Details?id=@(book.ID)">@(book.Title)</a></td>
+                <td>@(book.Author.Name)</td>
+                <td>@(book.PublicationDate.ToShortDateString())</td>
+                @if (book.Borrows.Any())
+                {
+                    <td>@(((DateTime)book.Borrows.Last().CheckedOutDate).ToShortDateString())</td>
+                    <td>@(((DateTime)book.Borrows.Last().DueDate).ToShortDateString())</td>
+                    <td>@((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToShortDateString()))</td>
+                }
+                else
+                {
+                    <td>Not Checked Out</td>
+                    <td>Not Checked Out</td>
+                    <td>Not Checked Out</td>
+                }
+            </tr>
+        }
+    </table>
+}
+else
+{
+    <p>No books have been checked out.</p>
+}
+
+<h1>OverDue Books</h1>
+@if (ViewBag.overdueBooks != null && ViewBag.overdueBooks.Count > 0)
+{
+    @foreach (Book overdueBook in ViewBag.overdueBooks)
+    {
+        <p>@(overdueBook.Title)</p>
+    }
+}
+else
+{
+    <p>None of the Checkedout books is overdue.</p>
+}
