@@ -20,6 +20,9 @@
         <p>
             Returned date is: @((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToLongDateString())).
         </p>
+        <p>
+            Extensions Granted: @(book.Borrows.Last().ExtensionCount)
+        </p>
 
         <a class="btn btn-success" href="/Book/Return?id=@(book.ID)">Return Book</a>
 
