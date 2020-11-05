@@ -9,7 +9,7 @@ namespace LibraryDueDateTracker.Models
     public class LibraryContext : DbContext
     {
         public virtual DbSet<Author> Authors { get; set; }
-        public virtual DbSet<Book> Books { get; set; }
+        public virtual DbSet<Book> Books { get; set; }       
         public virtual DbSet<Borrow> Borrows { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -133,7 +133,7 @@ namespace LibraryDueDateTracker.Models
             modelBuilder.Entity<Borrow>(entity =>
             {
                 string keyForBorrow = "FK_" + nameof(Borrow) +
-                    "_" + nameof(Book);
+                    "_" + nameof(Book);                
 
                 entity.HasIndex(e => e.BookID)
                     .HasName(keyForBorrow);
@@ -151,7 +151,8 @@ namespace LibraryDueDateTracker.Models
                         BookID = -3,
                         CheckedOutDate = new DateTime(2019, 12, 25),
                         DueDate = new DateTime(2020, 01, 08),
-                        ReturnedDate = new DateTime(2020, 01, 07)
+                        ReturnedDate = new DateTime(2020, 01, 07),
+                        ExtensionCount = 0
                     },
                     new Borrow()
                     {
@@ -159,14 +160,16 @@ namespace LibraryDueDateTracker.Models
                         BookID = -2,
                         CheckedOutDate = new DateTime(2019, 12, 25),
                         DueDate = new DateTime(2020, 01, 15),
-                        ReturnedDate = new DateTime(2020, 01, 15)
+                        ReturnedDate = new DateTime(2020, 01, 15),
+                        ExtensionCount = 1
                     },
                    new Borrow()
                    {
                        ID = -3,
                        BookID = -1,
                        CheckedOutDate = new DateTime(2019, 12, 25),
-                       DueDate = new DateTime(2020, 01, 08)
+                       DueDate = new DateTime(2020, 01, 08),
+                       ExtensionCount = 0
                    },
                    new Borrow()
                    {
@@ -174,10 +177,10 @@ namespace LibraryDueDateTracker.Models
                        BookID = -5,
                        CheckedOutDate = new DateTime(2020, 10, 02),
                        DueDate = new DateTime(2020, 10, 23),
-                       ReturnedDate = new DateTime(2020, 10, 22)
+                       ReturnedDate = new DateTime(2020, 10, 22),
+                       ExtensionCount = 1
                    }
                 );
-
             });
         }
     }
