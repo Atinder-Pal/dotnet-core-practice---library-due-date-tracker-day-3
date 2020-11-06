@@ -52,8 +52,7 @@ namespace LibraryDueDateTracker.Controllers
             else
             {
                 ViewBag.list = GetBooks();
-            }
-            
+            }            
             //ViewBag.overdueBooks = GetOverdueBooks();
             return View();
         }
@@ -66,6 +65,10 @@ namespace LibraryDueDateTracker.Controllers
             }
             catch (ValidationException e)
             {
+                ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
+                ViewBag.Exception = e;
+                ViewBag.Error = true;
+
                 //ViewBag.addMessage = TempData["Message"];
                 //ViewBag.Exception = TempData["Exception"];
                 //ViewBag.Error = TempData["Error"];
@@ -200,8 +203,34 @@ namespace LibraryDueDateTracker.Controllers
         }
         public Book GetBookByID(string id)
         {
+            int parsedID = 0;
+            ValidationException exception = new ValidationException();
+
+            id = !(string.IsNullOrWhiteSpace(id) || string.IsNullOrEmpty(id)) ? id.Trim() : null;
             using LibraryContext context = new LibraryContext();
-            return context.Books.Where(book => book.ID == int.Parse(id))
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                exception.ValidationExceptions.Add(new Exception("Book ID not found"));
+            }
+            else
+            {
+                if(!int.TryParse(id, out parsedID))
+                {
+                    exception.ValidationExceptions.Add(new Exception("Book ID not valid"));
+                }
+                else
+                {
+                    if(!context.Books.Any(book => book.ID == parsedID))
+                    {
+                        exception.ValidationExceptions.Add(new Exception("Book not found"));
+                    }
+                }
+            }
+            if(exception.ValidationExceptions.Count >0)
+            {
+                throw exception;
+            }
+            return context.Books.Where(book => book.ID == parsedID)
                 .Include(book => book.Borrows).Include(x => x.Author).SingleOrDefault();
         }
         public void ExtendDueDateForBookByID(string id)
