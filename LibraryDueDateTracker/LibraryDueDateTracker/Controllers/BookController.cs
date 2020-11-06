@@ -27,11 +27,13 @@ namespace LibraryDueDateTracker.Controllers
 
                     ViewBag.addMessage = $"You have successfully created {createdBook.Title}.";
                 }
-                catch (Exception e)
+                catch (ValidationException e)
                 {
                     ViewBag.authorID = authorID;
                     ViewBag.bookTitle = title;
-                    ViewBag.addMessage = $"Unable to create book: {e.Message}";
+                    ViewBag.addMessage = "There exist problem(s) with your submission, see below.";                      
+                    ViewBag.Exception = e;
+                    ViewBag.Error = true;
                 }
             }
             return View();
@@ -91,6 +93,7 @@ namespace LibraryDueDateTracker.Controllers
         {
             int parsedAuthorID = 0;
             DateTime parsedPublicationdate;
+            ValidationException exception = new ValidationException();
 
             // Trim the values so we don't need to do it a bunch of times later.
             authorID = !(string.IsNullOrWhiteSpace(authorID) || string.IsNullOrEmpty(authorID)) ? authorID.Trim() : null;
@@ -101,20 +104,20 @@ namespace LibraryDueDateTracker.Controllers
             // No value for authorID.
             if (string.IsNullOrWhiteSpace(authorID))
             {
-                throw new Exception("AuthorID Not Provided");
+                exception.ValidationExceptions.Add(new Exception("AuthorID Not Provided"));
             }
             else
             {
                 // Author ID fails parse.
                 if (!int.TryParse(authorID, out parsedAuthorID))
                 {
-                    throw new Exception("Author ID Not Valid");
+                    exception.ValidationExceptions.Add(new Exception("Author ID Not Valid"));
                 }
                 else
                 {
                     if (!context.Authors.Any(x => x.ID == parsedAuthorID))
                     {
-                        throw new Exception("Author Does Not Exist");
+                        exception.ValidationExceptions.Add(new Exception("Author Does Not Exist"));
                     }
                 }
             }
@@ -122,41 +125,45 @@ namespace LibraryDueDateTracker.Controllers
             // No value for title.
             if (string.IsNullOrWhiteSpace(title))
             {
-                throw new Exception("Title Not Provided");
+                exception.ValidationExceptions.Add(new Exception("Title Not Provided"));
             }
             else
             {
                 if (title.Length > 100)
                 {
-                    throw new Exception("Title length exceeds 100 characters");
+                    exception.ValidationExceptions.Add(new Exception("Title length exceeds 100 characters"));
                 }
                 else
                 {
                     List<int> authorList = context.Books.Where(x => x.Title.ToLower() == title.ToLower()).Select(x => x.AuthorID).ToList();
                     if (authorList.Any() && authorList.Contains(parsedAuthorID))
                     {
-                        throw new Exception($"The Title already exists for this Author.");
+                        exception.ValidationExceptions.Add(new Exception($"The Title already exists for this Author."));
                     }
                 }
             }
             if (string.IsNullOrWhiteSpace(publicationDate))
             {
-                throw new Exception("Publication Date  Not Provided");
+                exception.ValidationExceptions.Add(new Exception("Publication Date  Not Provided"));
             }
             else
             {
                 // publicationDate fails parse.
                 if (!DateTime.TryParse(publicationDate, out parsedPublicationdate))
                 {
-                    throw new Exception("Publication Date Not Valid");
+                    exception.ValidationExceptions.Add(new Exception("Publication Date Not Valid"));
                 }
                 else
                 {
                     if (parsedPublicationdate > DateTime.Today)
                     {
-                        throw new Exception("Publication date can not be in future.");
+                        exception.ValidationExceptions.Add(new Exception("Publication date can not be in future."));
                     }
                 }
+            }
+            if (exception.ValidationExceptions.Count > 0)
+            {
+                throw exception;
             }
 
             Book newBook = new Book()

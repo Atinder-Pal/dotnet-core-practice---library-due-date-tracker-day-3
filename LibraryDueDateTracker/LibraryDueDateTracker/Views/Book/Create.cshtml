@@ -2,7 +2,19 @@
 @{
     ViewData["Title"] = "Create";
 }
-
+@if (ViewBag.addMessage != null)
+{
+    <p class="alert-@(ViewBag.Error != null ? "danger" : "success")">@(ViewBag.addMessage)</p>
+    if (ViewBag.Error != null)
+    {
+        <ul>
+            @foreach (Exception e in ViewBag.Exception.ValidationExceptions)
+            {
+                <li class="alert-danger">@(e.Message)</li>
+            }
+        </ul>
+    }
+}
 <h1>Create</h1>
 <section>
     <h2>Create a Book</h2>
@@ -30,12 +42,5 @@
         <input id="publicationDate" type="date" name="publicationDate" value="" max="@(DateTime.Today.ToShortDateString())" required /><br />
         <input type="submit" value="Submit" />
     </form>
-</section>
-
-<section>
-    @if (ViewBag.addMessage != null)
-    {
-        <p>@(ViewBag.addMessage)</p>
-    }
 </section>
 
