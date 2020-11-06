@@ -89,15 +89,14 @@ namespace LibraryDueDateTracker.Controllers
 
         public Book CreateBook(string title, string authorID, string publicationDate)
         {
-            int parsedAuthorID =0;
+            int parsedAuthorID = 0;
             DateTime parsedPublicationdate;
 
             // Trim the values so we don't need to do it a bunch of times later.
-            authorID = !(string.IsNullOrEmpty(authorID) || string.IsNullOrWhiteSpace(authorID)) ? authorID.Trim() : null;
-            title = !(string.IsNullOrEmpty(title) || string.IsNullOrWhiteSpace(title)) ? title.Trim() : null;
-            publicationDate = !(string.IsNullOrEmpty(publicationDate) || string.IsNullOrWhiteSpace(publicationDate)) ? publicationDate.Trim() : null;
-            // Check for individual validation cases and throw an exception if they fail.
-            
+            authorID = !(string.IsNullOrWhiteSpace(authorID) || string.IsNullOrEmpty(authorID)) ? authorID.Trim() : null;
+            title = !(string.IsNullOrWhiteSpace(title) || string.IsNullOrEmpty(title)) ? title.Trim() : null;
+            publicationDate = !(string.IsNullOrWhiteSpace(publicationDate) || string.IsNullOrEmpty(publicationDate)) ? publicationDate.Trim() : null;
+
             using LibraryContext context = new LibraryContext();
             // No value for authorID.
             if (string.IsNullOrWhiteSpace(authorID))
@@ -113,13 +112,12 @@ namespace LibraryDueDateTracker.Controllers
                 }
                 else
                 {
-                    // Author ID exists.                    
                     if (!context.Authors.Any(x => x.ID == parsedAuthorID))
                     {
                         throw new Exception("Author Does Not Exist");
                     }
                 }
-            }            
+            }
 
             // No value for title.
             if (string.IsNullOrWhiteSpace(title))
@@ -128,23 +126,19 @@ namespace LibraryDueDateTracker.Controllers
             }
             else
             {
-                //Title exceed its database size
                 if (title.Length > 100)
                 {
-                    throw new Exception("The Maximum Length of a Title is 100 Characters"));
-                }                
+                    throw new Exception("Title length exceeds 100 characters");
+                }
                 else
                 {
-                    if (context.Books.Any(x => x.Title.ToLower() == title.ToLower()))
+                    List<int> authorList = context.Books.Where(x => x.Title.ToLower() == title.ToLower()).Select(x => x.AuthorID).ToList();
+                    if (authorList.Any() && authorList.Contains(parsedAuthorID))
                     {
-                        List<int> authorList = context.Books.Where(x => x.Title.ToLower() == title.ToLower()).Select(x => x.AuthorID).ToList();
-
-                        if (authorList.Contains(parsedAuthorID))
-                        throw new Exception("Book Title already exists for this Author");
+                        throw new Exception($"The Title already exists for this Author.");
                     }
                 }
             }
-
             if (string.IsNullOrWhiteSpace(publicationDate))
             {
                 throw new Exception("Publication Date  Not Provided");
@@ -156,7 +150,15 @@ namespace LibraryDueDateTracker.Controllers
                 {
                     throw new Exception("Publication Date Not Valid");
                 }
-            }             
+                else
+                {
+                    if (parsedPublicationdate > DateTime.Today)
+                    {
+                        throw new Exception("Publication date can not be in future.");
+                    }
+                }
+            }
+
             Book newBook = new Book()
             {
                 AuthorID = int.Parse(authorID),
@@ -166,7 +168,7 @@ namespace LibraryDueDateTracker.Controllers
 
             context.Books.Add(newBook);
             context.SaveChanges();
-            return newBook;            
+            return newBook;
         }
         public Book GetBookByID(string id)
         {

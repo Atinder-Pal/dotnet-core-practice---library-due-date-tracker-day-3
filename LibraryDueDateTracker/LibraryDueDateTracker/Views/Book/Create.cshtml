@@ -27,7 +27,7 @@
         </select>
 
         <label for="publicationDate">Publication Date</label>
-        <input id="publicationDate" type="date" name="publicationDate" value="" required /><br />
+        <input id="publicationDate" type="date" name="publicationDate" value="" max="@(DateTime.Today.ToShortDateString())" required /><br />
         <input type="submit" value="Submit" />
     </form>
 </section>
