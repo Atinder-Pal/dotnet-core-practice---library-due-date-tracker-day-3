@@ -3,7 +3,19 @@
 @{
     ViewData["Title"] = "Details";
 }
-
+@if (ViewBag.addMessage != null)
+{
+    <p class="alert-@(ViewBag.Error != null ? "danger" : "success")">@(ViewBag.addMessage)</p>
+    if (ViewBag.Error != null)
+    {
+        <ul>
+            @foreach (Exception e in ViewBag.Exception.ValidationExceptions)
+            {
+                <li class="alert-danger">@(e.Message)</li>
+            }
+        </ul>
+    }
+}
 <h1>Details</h1>
 @if (ViewBag.bookDetails != null)
 {
@@ -33,6 +45,7 @@
         <p>This book has never been checked out!</p>
     }
     <a class="btn btn-danger" href="/Book/Delete?id=@(book.ID)">Delete Book</a>
+    
 
     @if (!book.Borrows.Any() || book.Borrows.Last().ReturnedDate != null)
     {

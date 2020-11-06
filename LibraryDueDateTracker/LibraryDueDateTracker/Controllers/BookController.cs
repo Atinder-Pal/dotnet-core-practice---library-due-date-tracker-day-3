@@ -39,30 +39,37 @@ namespace LibraryDueDateTracker.Controllers
             return View();
         }
 
-        public IActionResult List()
+        public IActionResult List(string filter)
         {
-            ViewBag.list = GetBooks();
-            ViewBag.overdueBooks = GetOverdueBooks();
+            if(Request.Method =="POST")
+            {
+                ViewBag.status = filter == "true" ? "checked" : "";
+                if(filter == "true")
+                    ViewBag.list = GetOverdueBooks();
+                else
+                    ViewBag.list = GetBooks();
+            }
+            else
+            {
+                ViewBag.list = GetBooks();
+            }
+            
+            //ViewBag.overdueBooks = GetOverdueBooks();
             return View();
         }
 
         public IActionResult Details(string id)
         {
-            if (string.IsNullOrEmpty(id.Trim()) || string.IsNullOrWhiteSpace(id.Trim()))
+            try
             {
-                ViewBag.errorMessage = "No book selected.";
+                ViewBag.bookDetails = GetBookByID(id);
             }
-            else
+            catch (ValidationException e)
             {
-                try
-                {
-                    ViewBag.bookDetails = GetBookByID(id);
-                }
-                catch
-                {
-
-                }
-            }
+                //ViewBag.addMessage = TempData["Message"];
+                //ViewBag.Exception = TempData["Exception"];
+                //ViewBag.Error = TempData["Error"];
+            }            
             return View();
         }
 
@@ -85,8 +92,22 @@ namespace LibraryDueDateTracker.Controllers
         }
         public IActionResult Borrow(string id)
         {
-            CreateBorrow(id);
-            return RedirectToAction("List");
+            try
+            {
+                CreateBorrow(id);
+                ViewBag.addMessage = "Borrow successful!";
+            }
+            catch (ValidationException e)
+            {                
+                ViewBag.addMessage = "Borrow unsuccessful, see below.";
+                ViewBag.Exception = e;
+                ViewBag.Error = true;
+
+                //TempData["Message"] = ViewBag.addMessage;
+                //TempData["Exception"] = ViewBag.Exception;
+                //TempData["Error"] = ViewBag.Error;
+            }
+            return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
         }
 
         public Book CreateBook(string title, string authorID, string publicationDate)
@@ -222,7 +243,10 @@ namespace LibraryDueDateTracker.Controllers
             //End Citation
             */
             List<Book> overdueBooks = context.Borrows.Where(borrow => borrow.DueDate < DateTime.Today && borrow.ReturnedDate == null).Select(borrow => borrow.Book).ToList();
-            return overdueBooks;
+            //List<Borrow> overdueBorrow = context.Borrows.Where(borrow => borrow.DueDate < DateTime.Today && borrow.ReturnedDate == null).ToList();
+
+            List<Book> overdueBooks1 = context.Books.Include(book => book.Borrows).Include(x => x.Author).Where(book => overdueBooks.Contains(book)).ToList();
+            return overdueBooks1;
         }
     }
 }

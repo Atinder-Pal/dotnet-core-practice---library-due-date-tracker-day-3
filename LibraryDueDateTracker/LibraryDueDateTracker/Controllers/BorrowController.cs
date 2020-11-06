@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using LibraryDueDateTracker.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryDueDateTracker.Controllers
 {
@@ -39,15 +40,56 @@ namespace LibraryDueDateTracker.Controllers
         public static void CreateBorrow(string id)
         {
             using LibraryContext context = new LibraryContext();
+
+            int parsedID = 0;
+            ValidationException exception = new ValidationException();
+            // Trim the values so we don't need to do it a bunch of times later.
+            id = !(string.IsNullOrWhiteSpace(id) || string.IsNullOrEmpty(id)) ? id.Trim() : null;
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                exception.ValidationExceptions.Add(new Exception("Can't find Book ID"));
+            }
+            else
+            {
+                // Book ID fails parse.
+                if (!int.TryParse(id, out parsedID))
+                {
+                    exception.ValidationExceptions.Add(new Exception("Book ID Not Valid"));
+                }
+                else
+                {
+                    Book book = context.Books.Where(x => x.ID == parsedID).Include(x => x.Borrows).SingleOrDefault();
+                    if (book == null)
+                    {
+                        exception.ValidationExceptions.Add(new Exception("Book Does Not Exist"));
+                    }
+                    else
+                    {
+                        if(book.Borrows.Any())
+                        {
+                            //if book is not returned, it can't be borrowed
+                            if (book.Borrows.Any(x => x.ReturnedDate == null))
+                            {
+                                exception.ValidationExceptions.Add(new Exception("Book already checked out, It can't be borrowed again without returning it."));
+                            }
+                        }                        
+                    }
+                }
+            }
+            if (exception.ValidationExceptions.Count > 0)
+            {
+                throw exception;
+            }
+
             Borrow newBorrow = new Borrow()
             {
                 CheckedOutDate = DateTime.Today,
                 DueDate = DateTime.Today.AddDays(14),
                 ReturnedDate = null
             };
-            newBorrow.BookID = int.Parse(id);
+            newBorrow.BookID = parsedID;
             context.Borrows.Add(newBorrow);
-
             //context.Books.Where(book => book.ID == int.Parse(id)).Single().Borrows.Add(newBorrow);
             context.SaveChanges();
         }

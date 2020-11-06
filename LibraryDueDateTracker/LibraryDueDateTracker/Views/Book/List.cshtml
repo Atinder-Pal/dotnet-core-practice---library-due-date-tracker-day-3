@@ -2,9 +2,12 @@
 @{
     ViewData["Title"] = "List";
 }
-
+<form action="/Book/List" method="post">
+    <label for="filter">Filter to Overdue</label>
+    <input type="checkbox" name="filter" id="filter" value="true" onclick="submit()" @(ViewBag.status)/>
+</form>
 <h1>List</h1>
-<
+
 @if (ViewBag.list != null && ViewBag.list.Count > 0)
 {
     <table class="table">
