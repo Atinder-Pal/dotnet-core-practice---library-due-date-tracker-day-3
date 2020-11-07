@@ -41,13 +41,12 @@ namespace LibraryDueDateTracker.Controllers
 
         public IActionResult List(string filter)
         {
-            if(Request.Method =="POST")
+            if(filter == "overdue")
             {
-                ViewBag.status = filter == "true" ? "checked" : "";
-                if(filter == "true")
-                    ViewBag.list = GetOverdueBooks();
-                else
-                    ViewBag.list = GetBooks();
+                ViewBag.status = filter == "overdue" ? "checked" : "";
+                
+                ViewBag.list = GetOverdueBooks();
+                
             }
             else
             {

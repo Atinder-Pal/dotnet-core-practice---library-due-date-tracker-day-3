@@ -4,7 +4,7 @@
 }
 <form action="/Book/List" method="post">
     <label for="filter">Filter to Overdue</label>
-    <input type="checkbox" name="filter" id="filter" value="true" onclick="submit()" @(ViewBag.status)/>
+    <input type="checkbox" name="filter" id="filter" value="overdue" onclick="submit()" @(ViewBag.status)/>
 </form>
 <h1>List</h1>
 
