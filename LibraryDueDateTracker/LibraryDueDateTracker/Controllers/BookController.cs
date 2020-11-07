@@ -58,37 +58,36 @@ namespace LibraryDueDateTracker.Controllers
 
         public IActionResult Details(string id, string op)
         {
-            if(op == "delete")
+            try
             {
-                DeleteBookByID(id);
-            }
-            else if(op == "return")
-            {
-                ReturnBookByID(id);
-            }
-            else if (op == "extend")
-            {
-                ExtendDueDateForBookByID(id);
-            }
-            else if (op == "borrow")
-            {
-                CreateBorrow(id);
-            }
-           
-                try
+                if (op == "delete")
                 {
-                    ViewBag.bookDetails = GetBookByID(id);
+                    DeleteBookByID(id);
                 }
-                catch (ValidationException e)
+                else if(op == "return")
                 {
-                    ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
-                    ViewBag.Exception = e;
-                    ViewBag.Error = true;
-
-                    //ViewBag.addMessage = TempData["Message"];
-                    //ViewBag.Exception = TempData["Exception"];
-                    //ViewBag.Error = TempData["Error"];
-                }                 
+                    ReturnBookByID(id);
+                }
+                else if (op == "extend")
+                {
+                    ExtendDueDateForBookByID(id);
+                }
+                else if (op == "borrow")
+                {
+                    CreateBorrow(id);
+                }           
+                
+            }
+            catch (ValidationException e)
+            {
+                ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
+                ViewBag.Exception = e;
+                ViewBag.Error = true;
+            }
+            finally
+            {
+                ViewBag.bookDetails = GetBookByID(id);
+            }
                    
             return View();
         }
