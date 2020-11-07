@@ -51,11 +51,20 @@ namespace LibraryDueDateTracker.Controllers
                         else if (!book.Borrows.Any(x => x.ReturnedDate == null))
                         {
                             exception.ValidationExceptions.Add(new Exception("Book has not been checked out after last return"));
-                        }
-                        else if (book.Borrows.Where(x => x.ReturnedDate == null).SingleOrDefault().ExtensionCount > 2)
+                        }                     
+                       
+                        else if (book.Borrows.LastOrDefault(x => x.ReturnedDate == null).ExtensionCount > 2)
                         {
                             exception.ValidationExceptions.Add(new Exception("Sorry! Only 3 extensions are allowed! Please return the book."));
                         }
+                        else
+                        {
+                            BookController bookController = new BookController();
+                            if(bookController.GetOverdueBooks().Select(x => x.ID).Contains(parsedID))
+                            {
+                                exception.ValidationExceptions.Add(new Exception("Sorry! Overdue books can not be extended. Please return the book."));
+                            }
+                        }                        
                     }
                 }
             }
