@@ -36,20 +36,20 @@
             Extensions Granted: @(book.Borrows.Last().ExtensionCount)
         </p>
 
-        <a class="btn btn-success" href="/Book/Return?id=@(book.ID)">Return Book</a>
+        <a class="btn btn-success" href="/Book/Details?id=@(book.ID)&op=return">Return Book</a>
 
-        <a class="btn btn-primary" href="/Book/Extend?id=@(book.ID)">Extend Due Date</a>
+        <a class="btn btn-primary" href="/Book/Details?id=@(book.ID)&op=extend">Extend Due Date</a>
     }
     else
     {
         <p>This book has never been checked out!</p>
     }
-    <a class="btn btn-danger" href="/Book/Delete?id=@(book.ID)">Delete Book</a>
+    <a class="btn btn-danger" href="/Book/Details?id=@(book.ID)&op=delete">Delete Book</a>
     
 
     @if (!book.Borrows.Any() || book.Borrows.Last().ReturnedDate != null)
     {
-        <a class="btn btn-primary" href="/Book/Borrow?id=@(book.ID)">Borrow</a>
+        <a class="btn btn-primary" href="/Book/Details?id=@(book.ID)&op=borrow">Borrow</a>
     }
 
 }

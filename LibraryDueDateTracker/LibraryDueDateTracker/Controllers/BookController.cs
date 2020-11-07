@@ -56,61 +56,79 @@ namespace LibraryDueDateTracker.Controllers
             return View();
         }
 
-        public IActionResult Details(string id)
+        public IActionResult Details(string id, string op)
         {
-            try
+            if(op == "delete")
             {
-                ViewBag.bookDetails = GetBookByID(id);
+                DeleteBookByID(id);
             }
-            catch (ValidationException e)
+            else if(op == "return")
             {
-                ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
-                ViewBag.Exception = e;
-                ViewBag.Error = true;
+                ReturnBookByID(id);
+            }
+            else if (op == "extend")
+            {
+                ExtendDueDateForBookByID(id);
+            }
+            else if (op == "borrow")
+            {
+                CreateBorrow(id);
+            }
+           
+                try
+                {
+                    ViewBag.bookDetails = GetBookByID(id);
+                }
+                catch (ValidationException e)
+                {
+                    ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
+                    ViewBag.Exception = e;
+                    ViewBag.Error = true;
 
-                //ViewBag.addMessage = TempData["Message"];
-                //ViewBag.Exception = TempData["Exception"];
-                //ViewBag.Error = TempData["Error"];
-            }            
+                    //ViewBag.addMessage = TempData["Message"];
+                    //ViewBag.Exception = TempData["Exception"];
+                    //ViewBag.Error = TempData["Error"];
+                }                 
+                   
             return View();
         }
 
-        public IActionResult Extend(string id)
-        {
-            ExtendDueDateForBookByID(id);
-            return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
-        }
+        //public IActionResult Extend(string id)
+        //{
+        //    ExtendDueDateForBookByID(id);
+        //    return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
+        //}
 
-        public IActionResult Return(string id)
-        {
-            ReturnBookByID(id);
-            return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
-        }
+        //public IActionResult Return(string id)
+        //{
+        //    ReturnBookByID(id);
+        //    return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
+        //}
 
-        public IActionResult Delete(string id)
-        {
-            DeleteBookByID(id);
-            return RedirectToAction("List");
-        }
-        public IActionResult Borrow(string id)
-        {
-            try
-            {
-                CreateBorrow(id);
-                ViewBag.addMessage = "Borrow successful!";
-            }
-            catch (ValidationException e)
-            {                
-                ViewBag.addMessage = "Borrow unsuccessful, see below.";
-                ViewBag.Exception = e;
-                ViewBag.Error = true;
+        //public IActionResult Delete(string id)
+        //{
+        //    DeleteBookByID(id);
+        //    return RedirectToAction("List");
+        //}
+        //public IActionResult Borrow(string id)
+        //{
+        //    try
+        //    {
+        //        CreateBorrow(id);
+        //        ViewBag.addMessage = "Borrow successful!";
+        //    }
+        //    catch (ValidationException e)
+        //    {                
+        //        ViewBag.addMessage = "Borrow unsuccessful, see below.";
+        //        ViewBag.Exception = e;
+        //        ViewBag.Error = true;
 
-                //TempData["Message"] = ViewBag.addMessage;
-                //TempData["Exception"] = ViewBag.Exception;
-                //TempData["Error"] = ViewBag.Error;
-            }
-            return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
-        }
+        //        //TempData["Message"] = ViewBag.addMessage;
+        //        //TempData["Exception"] = ViewBag.Exception;
+        //        //TempData["Error"] = ViewBag.Error;
+        //    }
+        //    return RedirectToAction("Details", new Dictionary<string, string>() { { "id", id } });
+        //}
 
         public Book CreateBook(string title, string authorID, string publicationDate)
         {
