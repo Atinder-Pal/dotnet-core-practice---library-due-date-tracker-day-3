@@ -32,6 +32,14 @@ namespace LibraryDueDateTracker.Models
         [Column(TypeName = "date")]
         public DateTime PublicationDate { get; set; }
 
+        //Citation
+        //https://stackoverflow.com/questions/40730/what-is-the-best-way-to-give-a-c-sharp-auto-property-an-initial-value
+        //Add initialvalue to C# auto implemented property
+        [Required]
+        [Column(TypeName = "boolean")]
+        public bool Archived { get; set; } = false;
+        //End Citation
+
         [ForeignKey(nameof(AuthorID))]
         [InverseProperty(nameof(Models.Author.Books))]
         public virtual Author Author { get; set; }
