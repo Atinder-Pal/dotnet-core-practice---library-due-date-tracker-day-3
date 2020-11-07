@@ -26,14 +26,16 @@
 
     @if (book.Borrows.Any())
     {
+        //List<Borrow> borrows = book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderBy(x => x.ReturnedDate).ToList();
+        List<Borrow> borrows = book.Borrows.Any(x => x.ReturnedDate == null) ? book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderBy(x => x.ReturnedDate).ToList() : book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderByDescending(x => x.ReturnedDate).ToList();
         <p>
-            You checked out @(book.Title) on @(((DateTime)book.Borrows.Last().CheckedOutDate).ToLongDateString()), and the due date is @(((DateTime)book.Borrows.Last().DueDate).ToLongDateString()).
+            You checked out @(book.Title) on @(((DateTime)borrows.FirstOrDefault().CheckedOutDate).ToLongDateString()), and the due date is @(((DateTime)borrows.FirstOrDefault().DueDate).ToLongDateString()).
         </p>
         <p>
-            Returned date is: @((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToLongDateString())).
+            Returned date is: @((borrows.FirstOrDefault().ReturnedDate == null ? "Not Returned" : ((DateTime)borrows.FirstOrDefault().ReturnedDate).ToLongDateString())).
         </p>
         <p>
-            Extensions Granted: @(book.Borrows.Last().ExtensionCount)
+            Extensions Granted: @(borrows.FirstOrDefault().ExtensionCount)
         </p>
 
         <a class="btn btn-success" href="/Book/Details?id=@(book.ID)&op=return">Return Book</a>
@@ -47,7 +49,7 @@
     <a class="btn btn-danger" href="/Book/Details?id=@(book.ID)&op=delete">Delete Book</a>
     
 
-    @if (!book.Borrows.Any() || book.Borrows.Last().ReturnedDate != null)
+    @if (!book.Borrows.Any() || book.Borrows.OrderByDescending(x =>x.CheckedOutDate).OrderBy(x=>x.ReturnedDate).FirstOrDefault().ReturnedDate != null)
     {
         <a class="btn btn-primary" href="/Book/Details?id=@(book.ID)&op=borrow">Borrow</a>
     }

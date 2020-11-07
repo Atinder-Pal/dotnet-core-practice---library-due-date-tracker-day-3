@@ -30,13 +30,15 @@
         <td>@(book.PublicationDate.ToShortDateString())</td>
         @if (book.Borrows.Any())
         {
-            <td>@(((DateTime)book.Borrows.Last().CheckedOutDate).ToShortDateString())</td>
-            <td>@(((DateTime)book.Borrows.Last().DueDate).ToShortDateString())</td>
-            <td>@((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToShortDateString()))</td>
+            List<Borrow> borrows = book.Borrows.Any(x => x.ReturnedDate == null) ? book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderBy(x => x.ReturnedDate).ToList() : book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderByDescending(x => x.ReturnedDate).ToList();
+
+            <td>@(((DateTime)borrows.FirstOrDefault().CheckedOutDate).ToShortDateString())</td>
+            <td>@(((DateTime)borrows.FirstOrDefault().DueDate).ToShortDateString())</td>
+            <td>@((borrows.FirstOrDefault().ReturnedDate == null ? "Not Returned" : ((DateTime)borrows.FirstOrDefault().ReturnedDate).ToShortDateString()))</td>
             @*<td>@(DbFunctions.DiffDays((DateTime)book.Borrows.Last().DueDate, DateTime.Now)) </td>*@
-            @if (book.Borrows.Last().ReturnedDate == null)
+            @if (borrows.FirstOrDefault().ReturnedDate == null)
             {
-                double diff = (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays;
+                double diff = (DateTime.Now.Date - borrows.FirstOrDefault().DueDate.Date).TotalDays;
 
                 <td>@((diff < 0) ? 0 : diff)</td>
                 @*<td>@((double.Parse((DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays)) < 0 ? "" : (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays )</td>*@
@@ -60,5 +62,5 @@
 }
         else
         {
-    <p>No books found.</p>
+        <p>No books found.</p>
         }

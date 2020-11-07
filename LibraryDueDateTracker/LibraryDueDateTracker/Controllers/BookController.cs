@@ -273,7 +273,7 @@ namespace LibraryDueDateTracker.Controllers
         public List<Book> GetBooks()
         {
             using LibraryContext context = new LibraryContext();
-            return context.Books.Include(book => book.Borrows).Include(x => x.Author).ToList();
+            return context.Books.Include(book => book.Borrows).Include(x => x.Author).ToList();    
         }
 
         public List<Book> GetOverdueBooks()
