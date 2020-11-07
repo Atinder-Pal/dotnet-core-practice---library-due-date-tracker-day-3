@@ -15,12 +15,59 @@ namespace LibraryDueDateTracker.Controllers
             return View();
         }
 
-        public static void ExtendDueDateForBorrowByID(string bookID)
+        public static void ExtendDueDateForBorrowByID(string id)
         {
+            int parsedID = 0;
+            ValidationException exception = new ValidationException();
             using LibraryContext context = new LibraryContext();
-            var listRequiredBorrow = context.Borrows.Where(borrow => borrow.BookID == int.Parse(bookID)).ToList();
+            // Trim the values so we don't need to do it a bunch of times later.
+            id = !(string.IsNullOrWhiteSpace(id) || string.IsNullOrEmpty(id)) ? id.Trim() : null;
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                exception.ValidationExceptions.Add(new Exception("Can't find Book ID"));
+            }
+            else
+            {
+                // Book ID fails parse.
+                if (!int.TryParse(id, out parsedID))
+                {
+                    exception.ValidationExceptions.Add(new Exception("Book ID Not Valid"));
+                }
+                else
+                {
+                    Book book = context.Books.Where(x => x.ID == parsedID).Include(x => x.Borrows).SingleOrDefault();
+                    if (book == null)
+                    {
+                        exception.ValidationExceptions.Add(new Exception("Book Does Not Exist"));
+                    }
+                    else
+                    {
+                        if (!book.Borrows.Any())
+                        {
+                            exception.ValidationExceptions.Add(new Exception("Book has never been checked out"));
+                        }
+                        //if book is not returned, it can't be borrowed
+                        else if (!book.Borrows.Any(x => x.ReturnedDate == null))
+                        {
+                            exception.ValidationExceptions.Add(new Exception("Book has not been checked out after last return"));
+                        }
+                        else if (book.Borrows.Where(x => x.ReturnedDate == null).SingleOrDefault().ExtensionCount > 2)
+                        {
+                            exception.ValidationExceptions.Add(new Exception("Sorry! Only 3 extensions are allowed! Please return the book."));
+                        }
+                    }
+                }
+            }
+            if (exception.ValidationExceptions.Count > 0)
+            {
+                throw exception;
+            }
+
+            var listRequiredBorrow = context.Borrows.Where(borrow => borrow.BookID == int.Parse(id)).ToList();
             Borrow requiredBorrow = listRequiredBorrow.LastOrDefault();
             requiredBorrow.DueDate = requiredBorrow.DueDate.AddDays(7);
+            requiredBorrow.ExtensionCount += 1; 
             context.SaveChanges();
         }
         public static void ReturnBorrowByID(string id)
