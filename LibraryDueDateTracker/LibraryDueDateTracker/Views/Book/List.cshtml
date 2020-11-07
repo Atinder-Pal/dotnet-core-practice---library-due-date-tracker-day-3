@@ -1,10 +1,10 @@
 ﻿
-@{
+@{    
     ViewData["Title"] = "List";
 }
 <form action="/Book/List" method="post">
     <label for="filter">Filter to Overdue</label>
-    <input type="checkbox" name="filter" id="filter" value="overdue" onclick="submit()" @(ViewBag.status)/>
+    <input type="checkbox" name="filter" id="filter" value="overdue" onclick="submit()" @(ViewBag.status) />
 </form>
 <h1>List</h1>
 
@@ -19,44 +19,46 @@
             <th>Checked Out</th>
             <th>Due Date</th>
             <th>Returned</th>
+            <th>Overduedays</th>
         </tr>
         @foreach (Book book in ViewBag.list)
         {
-            <tr>
-                <td>@(book.ID)</td>
-                <td><a href="/Book/Details?id=@(book.ID)">@(book.Title)</a></td>
-                <td>@(book.Author.Name)</td>
-                <td>@(book.PublicationDate.ToShortDateString())</td>
-                @if (book.Borrows.Any())
-                {
-                    <td>@(((DateTime)book.Borrows.Last().CheckedOutDate).ToShortDateString())</td>
-                    <td>@(((DateTime)book.Borrows.Last().DueDate).ToShortDateString())</td>
-                    <td>@((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToShortDateString()))</td>
-                }
-                else
-                {
-                    <td>Not Checked Out</td>
-                    <td>Not Checked Out</td>
-                    <td>Not Checked Out</td>
-                }
-            </tr>
+    <tr>
+        <td>@(book.ID)</td>
+        <td><a href="/Book/Details?id=@(book.ID)">@(book.Title)</a></td>
+        <td>@(book.Author.Name)</td>
+        <td>@(book.PublicationDate.ToShortDateString())</td>
+        @if (book.Borrows.Any())
+        {
+            <td>@(((DateTime)book.Borrows.Last().CheckedOutDate).ToShortDateString())</td>
+            <td>@(((DateTime)book.Borrows.Last().DueDate).ToShortDateString())</td>
+            <td>@((book.Borrows.Last().ReturnedDate == null ? "Not Returned" : ((DateTime)book.Borrows.Last().ReturnedDate).ToShortDateString()))</td>
+            @*<td>@(DbFunctions.DiffDays((DateTime)book.Borrows.Last().DueDate, DateTime.Now)) </td>*@
+            @if (book.Borrows.Last().ReturnedDate == null)
+            {
+                double diff = (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays;
+
+                <td>@((diff < 0) ? 0 : diff)</td>
+                @*<td>@((double.Parse((DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays)) < 0 ? "" : (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays )</td>*@
+                @*<td>@(book.Borrows.Select(x => DbFunctions.DiffDays(x.DueDate, DateTime.Now)))</td>*@
+            }
+            else
+            {
+                <td>N/A</td>
+            }
+        }
+        else
+        {
+            <td>Not Checked Out</td>
+            <td>Not Checked Out</td>
+            <td>Not Checked Out</td>
+            <td>Not Checked Out</td>
+        }
+    </tr>
         }
     </table>
 }
-else
-{
+        else
+        {
     <p>No books found.</p>
-}
-
-@*<h1>OverDue Books</h1>
-@if (ViewBag.overdueBooks != null && ViewBag.overdueBooks.Count > 0)
-{
-    @foreach (Book overdueBook in ViewBag.overdueBooks)
-    {
-        <p>@(overdueBook.Title)</p>
-    }
-}
-else
-{
-    <p>None of the Checkedout books is overdue.</p>
-}*@
+        }
