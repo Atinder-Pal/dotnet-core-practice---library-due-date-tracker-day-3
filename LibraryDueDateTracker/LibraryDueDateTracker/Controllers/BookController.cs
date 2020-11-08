@@ -52,6 +52,10 @@ namespace LibraryDueDateTracker.Controllers
             {
                 ViewBag.list = GetArchivedBooks();
             }
+            else if (filter == "inStock")
+            {
+                ViewBag.list = GetInStockBooks();
+            }
             else
             {
                 ViewBag.list = GetBooks();
@@ -346,6 +350,12 @@ namespace LibraryDueDateTracker.Controllers
         {
             using LibraryContext context = new LibraryContext();
             return context.Books.Where(book => book.Archived == true).Include(book => book.Borrows).Include(x => x.Author).ToList();
+        }
+        public List<Book> GetInStockBooks()
+        {
+            using LibraryContext context = new LibraryContext();
+            return context.Books.Include(book => book.Borrows).Where(b => b.Archived == false && !b.Borrows.Any(b=>b.ReturnedDate==null)).Include(x => x.Author).ToList();
+            //return context.Borrows.Where(borrow => borrow.ReturnedDate != null).Select(b => b.Book).Include(x => x.Borrows).Include(x => x.Author).ToList();
         }
     }
 }
