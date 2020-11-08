@@ -318,7 +318,7 @@ namespace LibraryDueDateTracker.Controllers
         public List<Book> GetBooks()
         {
             using LibraryContext context = new LibraryContext();
-            return context.Books.Include(book => book.Borrows).Include(x => x.Author).ToList();    
+            return context.Books.Where(book => book.Archived == false).Include(book => book.Borrows).Include(x => x.Author).ToList();    
         }
 
         public List<Book> GetOverdueBooks()
@@ -335,7 +335,7 @@ namespace LibraryDueDateTracker.Controllers
             List<Book> overdueBooks = context.Borrows.Where(borrow => borrow.DueDate < DateTime.Today && borrow.ReturnedDate == null).Select(borrow => borrow.Book).ToList();
             //List<Borrow> overdueBorrow = context.Borrows.Where(borrow => borrow.DueDate < DateTime.Today && borrow.ReturnedDate == null).ToList();
 
-            List<Book> overdueBooks1 = context.Books.Include(book => book.Borrows).Include(x => x.Author).Where(book => overdueBooks.Contains(book)).ToList();
+            List<Book> overdueBooks1 = context.Books.Include(book => book.Borrows).Include(x => x.Author).Where(book => overdueBooks.Contains(book) && book.Archived == false).ToList();
             return overdueBooks1;
         }
     }
