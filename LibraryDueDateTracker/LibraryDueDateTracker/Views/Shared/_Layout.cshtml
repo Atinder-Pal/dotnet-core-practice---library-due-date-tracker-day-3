@@ -16,21 +16,11 @@
                         aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    @*<ul class="navbar-nav flex-grow-1">
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="List">Books</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Create">Create a Book</a>
-            </li>
-        </ul>*@
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">         
+                    @*Citation
+                    refereneced code for DropDown menu
+                    https://docs.microsoft.com/en-us/aspnet/core/mvc/views/tag-helpers/built-in/anchor-tag-helper?view=aspnetcore-3.1
+                    https://getbootstrap.com/docs/4.0/components/navs/*@
                     <ul class="nav nav-pills navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
@@ -41,7 +31,7 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link text-dark dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Books</a>
                             <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List">All Books</a>                               
+                                <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List">All Books</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="inStock">In-Stock Books</a>
                                 <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="archived">Archived Books</a>
                                 <div class="dropdown-divider"></div>
@@ -52,9 +42,8 @@
                                 </div>
                             </div>
                         </li>
-
-
                     </ul>
+                    @*End Citation*@
                 </div>
             </div>
         </nav>
