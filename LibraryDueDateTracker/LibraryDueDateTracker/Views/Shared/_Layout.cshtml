@@ -17,19 +17,43 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
+                    @*<ul class="navbar-nav flex-grow-1">
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="List">Books</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Create">Create a Book</a>
+            </li>
+        </ul>*@
+                    <ul class="nav nav-pills navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="List">Books</a>
-                        </li>
-                        <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Book" asp-action="Create">Create a Book</a>
                         </li>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link text-dark dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false">Books</a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List">All Books</a>                               
+                                <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="inStock">In-Stock Books</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="archived">Archived Books</a>
+                                <div class="dropdown-divider"></div>
+                                <a class="nav-link text-dark dropdown-toggle" data-toggle="dropdown" href="#" role="presentation" aria-haspopup="true" aria-expanded="false">Lent Books</a>
+                                <div class="dropdown-menu">
+                                    <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="lent">All Lent Books</a>
+                                    <a class="dropdown-item" asp-area="" asp-controller="Book" asp-action="List" asp-route-filter="overdue">Overdue Books</a>
+                                </div>
+                            </div>
+                        </li>
+
+
                     </ul>
                 </div>
             </div>
