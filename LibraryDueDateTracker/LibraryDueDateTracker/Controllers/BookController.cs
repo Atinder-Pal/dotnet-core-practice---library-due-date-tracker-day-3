@@ -265,8 +265,53 @@ namespace LibraryDueDateTracker.Controllers
 
         public void DeleteBookByID(string id)
         {
+            int parsedID = 0;
+            ValidationException exception = new ValidationException();
             using LibraryContext context = new LibraryContext();
-            context.Books.Remove(context.Books.Where(book => book.ID == int.Parse(id)).SingleOrDefault());
+            // Trim the values so we don't need to do it a bunch of times later.
+            id = !(string.IsNullOrWhiteSpace(id) || string.IsNullOrEmpty(id)) ? id.Trim() : null;
+
+            if (string.IsNullOrWhiteSpace(id))
+            {
+                exception.ValidationExceptions.Add(new Exception("Can't find Book ID"));
+            }
+            else
+            {
+                // Book ID fails parse.
+                if (!int.TryParse(id, out parsedID))
+                {
+                    exception.ValidationExceptions.Add(new Exception("Book ID Not Valid"));
+                }
+                else
+                {
+                    Book book = context.Books.Where(x => x.ID == parsedID).Include(x => x.Borrows).SingleOrDefault();
+                    if (book == null)
+                    {
+                        exception.ValidationExceptions.Add(new Exception("Book Does Not Exist"));
+                    }
+                    else
+                    {
+                        if (book.Archived == true)
+                        {
+                            exception.ValidationExceptions.Add(new Exception("Book has already been archived/deleted"));
+                        }
+                        //if book is not returned, it can't be archived
+                        else if (book.Borrows.Any())
+                        {
+                            if(book.Borrows.Any(x => x.ReturnedDate == null))
+                            {
+                                exception.ValidationExceptions.Add(new Exception("Book has not been returned. Please return it before you delete it."));
+                            }                            
+                        }                    
+                    }
+                }
+            }
+            if (exception.ValidationExceptions.Count > 0)
+            {
+                throw exception;
+            }
+
+            context.Books.Where(book => book.ID == parsedID).SingleOrDefault().Archived = true;
             context.SaveChanges();
         }
 
