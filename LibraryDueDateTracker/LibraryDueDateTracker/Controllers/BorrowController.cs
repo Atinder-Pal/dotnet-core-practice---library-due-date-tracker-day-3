@@ -167,6 +167,10 @@ namespace LibraryDueDateTracker.Controllers
                     {
                         exception.ValidationExceptions.Add(new Exception("Book Does Not Exist"));
                     }
+                    else if(book.Archived == true)
+                    {
+                        exception.ValidationExceptions.Add(new Exception("Cannot borrow archived book"));
+                    }
                     else
                     {
                         if(book.Borrows.Any())
