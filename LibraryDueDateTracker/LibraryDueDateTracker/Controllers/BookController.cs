@@ -48,6 +48,10 @@ namespace LibraryDueDateTracker.Controllers
                 ViewBag.list = GetOverdueBooks();
                 
             }
+            else if (filter == "archived")
+            {
+                ViewBag.list = GetArchivedBooks();
+            }
             else
             {
                 ViewBag.list = GetBooks();
@@ -337,6 +341,11 @@ namespace LibraryDueDateTracker.Controllers
 
             List<Book> overdueBooks1 = context.Books.Include(book => book.Borrows).Include(x => x.Author).Where(book => overdueBooks.Contains(book) && book.Archived == false).ToList();
             return overdueBooks1;
+        }
+        public List<Book> GetArchivedBooks()
+        {
+            using LibraryContext context = new LibraryContext();
+            return context.Books.Where(book => book.Archived == true).Include(book => book.Borrows).Include(x => x.Author).ToList();
         }
     }
 }
