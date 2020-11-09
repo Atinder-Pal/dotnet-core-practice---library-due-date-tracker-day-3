@@ -6,6 +6,7 @@
     <label for="filter">Filter to Overdue</label>
     <input type="checkbox" name="filter" id="filter" value="overdue" onclick="submit()" @(ViewBag.status) />
 </form>
+
 <h1>List of Books</h1>
 
 @if (ViewBag.list != null && ViewBag.list.Count > 0)
@@ -23,44 +24,44 @@
         </tr>
         @foreach (Book book in ViewBag.list)
         {
-    <tr>
-        <td>@(book.ID)</td>
-        <td><a href="/Book/Details?id=@(book.ID)">@(book.Title)</a></td>
-        <td>@(book.Author.Name)</td>
-        <td>@(book.PublicationDate.ToShortDateString())</td>
-        @if (book.Borrows.Any())
-        {
-            List<Borrow> borrows = book.Borrows.Any(x => x.ReturnedDate == null) ? book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderBy(x => x.ReturnedDate).ToList() : book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderByDescending(x => x.ReturnedDate).ToList();
+            <tr>
+                <td>@(book.ID)</td>
+                <td><a href="/Book/Details?id=@(book.ID)">@(book.Title)</a></td>
+                <td>@(book.Author.Name)</td>
+                <td>@(book.PublicationDate.ToShortDateString())</td>
+                @if (book.Borrows.Any())
+                {
+                    List<Borrow> borrows = book.Borrows.Any(x => x.ReturnedDate == null) ? book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderBy(x => x.ReturnedDate).ToList() : book.Borrows.OrderByDescending(x => x.CheckedOutDate).OrderByDescending(x => x.ReturnedDate).ToList();
 
-            <td>@(((DateTime)borrows.FirstOrDefault().CheckedOutDate).ToShortDateString())</td>
-            <td>@(((DateTime)borrows.FirstOrDefault().DueDate).ToShortDateString())</td>
-            <td>@((borrows.FirstOrDefault().ReturnedDate == null ? "Not Returned" : ((DateTime)borrows.FirstOrDefault().ReturnedDate).ToShortDateString()))</td>
-            @*<td>@(DbFunctions.DiffDays((DateTime)book.Borrows.Last().DueDate, DateTime.Now)) </td>*@
-            @if (borrows.FirstOrDefault().ReturnedDate == null)
-            {
-                double diff = (DateTime.Now.Date - borrows.FirstOrDefault().DueDate.Date).TotalDays;
+                    <td>@(((DateTime)borrows.FirstOrDefault().CheckedOutDate).ToShortDateString())</td>
+                    <td>@(((DateTime)borrows.FirstOrDefault().DueDate).ToShortDateString())</td>
+                    <td>@((borrows.FirstOrDefault().ReturnedDate == null ? "Not Returned" : ((DateTime)borrows.FirstOrDefault().ReturnedDate).ToShortDateString()))</td>
+                    @*<td>@(DbFunctions.DiffDays((DateTime)book.Borrows.Last().DueDate, DateTime.Now)) </td>*@
+                    @if (borrows.FirstOrDefault().ReturnedDate == null)
+                    {
+                        double diff = (DateTime.Now.Date - borrows.FirstOrDefault().DueDate.Date).TotalDays;
 
-                <td class="text-danger">@((diff < 0) ? 0 : diff)</td>
-                @*<td>@((double.Parse((DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays)) < 0 ? "" : (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays )</td>*@
-                @*<td>@(book.Borrows.Select(x => DbFunctions.DiffDays(x.DueDate, DateTime.Now)))</td>*@
-            }
-            else
-            {
-                <td ></td>
-            }
-        }
-        else
-        {
-            <td>Never Checked Out</td>
-            <td>Never Checked Out</td>
-            <td>Never Checked Out</td>
-            <td></td>
-        }
-    </tr>
+                        <td class="text-danger">@((diff < 0) ? 0 : diff)</td>
+                        @*<td>@((double.Parse((DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays)) < 0 ? "" : (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays )</td>*@
+                        @*<td>@(book.Borrows.Select(x => DbFunctions.DiffDays(x.DueDate, DateTime.Now)))</td>*@
+                    }
+                    else
+                    {
+                        <td></td>
+                    }
+                }
+                else
+                {
+                    <td>Never Checked Out</td>
+                    <td>Never Checked Out</td>
+                    <td>Never Checked Out</td>
+                    <td></td>
+                }
+            </tr>
         }
     </table>
 }
-        else
-        {
-        <p>No books found.</p>
-        }
+else
+{
+<p>No books found.</p>
+}

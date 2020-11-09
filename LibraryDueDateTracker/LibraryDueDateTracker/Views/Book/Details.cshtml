@@ -20,8 +20,6 @@
 @if (ViewBag.bookDetails != null)
 {
     Book book = ViewBag.bookDetails;
-
-
     <p> The Book "@(book.Title)" is written by "@(book.Author.Name)" and was published on @(book.PublicationDate.ToLongDateString()).</p>
 
     @if (book.Borrows.Any())
