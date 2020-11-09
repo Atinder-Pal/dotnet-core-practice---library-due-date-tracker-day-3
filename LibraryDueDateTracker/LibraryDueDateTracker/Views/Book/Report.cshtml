@@ -1,0 +1,11 @@
+﻿
+@{
+    ViewData["Title"] = "Report";
+}
+
+<h1>Report</h1>
+
+@foreach (MyType mt in ViewBag.dict) 
+{
+    <p>@(mt.MyString), @(mt.MyDouble)</p> 
+}

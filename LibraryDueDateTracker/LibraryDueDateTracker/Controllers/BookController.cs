@@ -31,7 +31,7 @@ namespace LibraryDueDateTracker.Controllers
                 {
                     ViewBag.authorID = authorID;
                     ViewBag.bookTitle = title;
-                    ViewBag.addMessage = "There exist problem(s) with your submission, see below.";                      
+                    ViewBag.addMessage = "There exist problem(s) with your submission, see below.";
                     ViewBag.Exception = e;
                     ViewBag.Error = true;
                 }
@@ -41,12 +41,12 @@ namespace LibraryDueDateTracker.Controllers
 
         public IActionResult List(string filter)
         {
-            if(filter == "overdue")
+            if (filter == "overdue")
             {
                 ViewBag.status = filter == "overdue" ? "checked" : "";
-                
+
                 ViewBag.list = GetOverdueBooks();
-                
+
             }
             else if (filter == "archived")
             {
@@ -63,7 +63,7 @@ namespace LibraryDueDateTracker.Controllers
             else
             {
                 ViewBag.list = GetBooks();
-            }                        
+            }
             return View();
         }
 
@@ -75,7 +75,7 @@ namespace LibraryDueDateTracker.Controllers
                 {
                     DeleteBookByID(id);
                 }
-                else if(op == "return")
+                else if (op == "return")
                 {
                     ReturnBookByID(id);
                 }
@@ -86,8 +86,8 @@ namespace LibraryDueDateTracker.Controllers
                 else if (op == "borrow")
                 {
                     CreateBorrow(id);
-                }           
-                
+                }
+
             }
             catch (ValidationException e)
             {
@@ -99,10 +99,14 @@ namespace LibraryDueDateTracker.Controllers
             {
                 ViewBag.bookDetails = GetBookByID(id);
             }
-                   
+
             return View();
         }
-
+        public IActionResult Report()
+        {
+            ViewBag.dict = GetSum();
+            return View();
+        }
         //public IActionResult Extend(string id)
         //{
         //    ExtendDueDateForBookByID(id);
@@ -241,19 +245,19 @@ namespace LibraryDueDateTracker.Controllers
             }
             else
             {
-                if(!int.TryParse(id, out parsedID))
+                if (!int.TryParse(id, out parsedID))
                 {
                     exception.ValidationExceptions.Add(new Exception("Book ID not valid"));
                 }
                 else
                 {
-                    if(!context.Books.Any(book => book.ID == parsedID))
+                    if (!context.Books.Any(book => book.ID == parsedID))
                     {
                         exception.ValidationExceptions.Add(new Exception("Book not found"));
                     }
                 }
             }
-            if(exception.ValidationExceptions.Count >0)
+            if (exception.ValidationExceptions.Count > 0)
             {
                 throw exception;
             }
@@ -309,11 +313,11 @@ namespace LibraryDueDateTracker.Controllers
                         //if book is not returned, it can't be archived
                         else if (book.Borrows.Any())
                         {
-                            if(book.Borrows.Any(x => x.ReturnedDate == null))
+                            if (book.Borrows.Any(x => x.ReturnedDate == null))
                             {
                                 exception.ValidationExceptions.Add(new Exception("Book has not been returned. Please return it before you delete it."));
-                            }                            
-                        }                    
+                            }
+                        }
                     }
                 }
             }
@@ -329,7 +333,7 @@ namespace LibraryDueDateTracker.Controllers
         public List<Book> GetBooks()
         {
             using LibraryContext context = new LibraryContext();
-            return context.Books.Where(book => book.Archived == false).Include(book => book.Borrows).Include(x => x.Author).ToList();    
+            return context.Books.Where(book => book.Archived == false).Include(book => book.Borrows).Include(x => x.Author).ToList();
         }
 
         public List<Book> GetOverdueBooks()
@@ -357,12 +361,39 @@ namespace LibraryDueDateTracker.Controllers
         public List<Book> GetInStockBooks()
         {
             using LibraryContext context = new LibraryContext();
-            return context.Books.Include(book => book.Borrows).Where(b => b.Archived == false && !b.Borrows.Any(b=>b.ReturnedDate==null)).Include(x => x.Author).ToList();            
+            return context.Books.Include(book => book.Borrows).Where(b => b.Archived == false && !b.Borrows.Any(b => b.ReturnedDate == null)).Include(x => x.Author).ToList();
         }
         public List<Book> GetAllLentBooks()
         {
             using LibraryContext context = new LibraryContext();
             return context.Books.Include(book => book.Borrows).Where(b => b.Archived == false && b.Borrows.Any(b => b.ReturnedDate == null)).Include(x => x.Author).ToList();
+        }
+        public List<MyType> GetSum()
+        {
+            
+            using LibraryContext context = new LibraryContext();
+            var groupBorrowsByBookID = context.Borrows.GroupBy(x => x.Book).Select(y => 
+            new MyType()
+            {  
+                MyString = y.Key.Title,
+                MyDouble = y.Sum(x => ((TimeSpan)((x.ReturnedDate ?? DateTime.Today) - x.CheckedOutDate)).Days)               
+            });
+            return groupBorrowsByBookID.Cast<MyType>().ToList(); ;
+
+
+            //var tempResult = group.Select(y => new MyType()
+            //{
+            //    MyString = y.Key.Name,
+            //    MyDouble = y.Sum(x => x.Borrows.Sum(y => ((y.ReturnedDate ?? DateTime.Today.Date) - y.CheckedOutDate.Date).TotalDays))
+            //}).ToList();
+            //return tempResult;
+
+            //var results = group.Select(y => new MyType()
+            //{
+            //    MyInt = y.Key,
+            //    MyDouble = y.Sum(x => x.Borrows.Sum(y => ((y.ReturnedDate ?? DateTime.Today.Date) - y.CheckedOutDate.Date).TotalDays))
+            //}).ToList();
+            //var result = context.Books.Include(x => x.Borrows).Include(x => x.Author).Select()
         }
     }
 }
