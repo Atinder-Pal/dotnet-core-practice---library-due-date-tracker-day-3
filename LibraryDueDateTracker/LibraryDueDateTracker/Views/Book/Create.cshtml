@@ -15,14 +15,14 @@
         </ul>
     }
 }
-<h1>Create</h1>
+<h1>Create a Book</h1>
 <section>
-    <h2>Create a Book</h2>
+    
     <form action="/Book/Create" method="POST">
         <label for="title">Title:</label>
-        <input id="title" type="text" name="title" value="@(ViewBag.bookTitle)" required /><br />
+        <input class="form-control" id="title" type="text" name="title" value="@(ViewBag.bookTitle)" required /><br />
         <label for="authorID">Select an Author:</label>
-        <select name="authorID" id="authorID" required>
+        <select class="form-control" name="authorID" id="authorID" required>
             <option value="" selected>Select an Author</option>
             @foreach (Author author in ViewBag.authors)
             {
@@ -39,7 +39,7 @@
         </select>
 
         <label for="publicationDate">Publication Date</label>
-        <input id="publicationDate" type="date" name="publicationDate" value="" max="@(DateTime.Today.ToShortDateString())" required /><br />
+        <input class="form-control" id="publicationDate" type="date" name="publicationDate" value="" max="@(DateTime.Today.ToShortDateString())" required /><br />
         <input type="submit" value="Submit" />
     </form>
 </section>

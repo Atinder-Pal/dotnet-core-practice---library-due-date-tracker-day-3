@@ -372,13 +372,14 @@ namespace LibraryDueDateTracker.Controllers
         {
             
             using LibraryContext context = new LibraryContext();
-            var groupBorrowsByBookID = context.Borrows.GroupBy(x => x.Book).Select(y => 
+            var groupBorrowsByBookID = context.Borrows.GroupBy(x => x.Book);
+            List<MyType>result = groupBorrowsByBookID.Select(y => 
             new MyType()
             {  
                 MyString = y.Key.Title,
                 MyDouble = y.Sum(x => ((TimeSpan)((x.ReturnedDate ?? DateTime.Today) - x.CheckedOutDate)).Days)               
-            });
-            return groupBorrowsByBookID.Cast<MyType>().ToList(); ;
+            }).Cast<MyType>().ToList();
+            return result;
 
 
             //var tempResult = group.Select(y => new MyType()

@@ -6,7 +6,7 @@
     <label for="filter">Filter to Overdue</label>
     <input type="checkbox" name="filter" id="filter" value="overdue" onclick="submit()" @(ViewBag.status) />
 </form>
-<h1>List</h1>
+<h1>List of Books</h1>
 
 @if (ViewBag.list != null && ViewBag.list.Count > 0)
 {
@@ -19,7 +19,7 @@
             <th>Checked Out</th>
             <th>Due Date</th>
             <th>Returned</th>
-            <th>Overduedays</th>
+            <th class="text-danger">Overduedays</th>
         </tr>
         @foreach (Book book in ViewBag.list)
         {
@@ -40,21 +40,21 @@
             {
                 double diff = (DateTime.Now.Date - borrows.FirstOrDefault().DueDate.Date).TotalDays;
 
-                <td>@((diff < 0) ? 0 : diff)</td>
+                <td class="text-danger">@((diff < 0) ? 0 : diff)</td>
                 @*<td>@((double.Parse((DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays)) < 0 ? "" : (DateTime.Now.Date - book.Borrows.Last().DueDate.Date).TotalDays )</td>*@
                 @*<td>@(book.Borrows.Select(x => DbFunctions.DiffDays(x.DueDate, DateTime.Now)))</td>*@
             }
             else
             {
-                <td>N/A</td>
+                <td ></td>
             }
         }
         else
         {
-            <td>Not Checked Out</td>
-            <td>Not Checked Out</td>
-            <td>Not Checked Out</td>
-            <td>Not Checked Out</td>
+            <td>Never Checked Out</td>
+            <td>Never Checked Out</td>
+            <td>Never Checked Out</td>
+            <td></td>
         }
     </tr>
         }
